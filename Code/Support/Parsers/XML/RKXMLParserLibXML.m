@@ -45,7 +45,19 @@
                 xmlChar* str = xmlNodeGetContent((xmlNode*)currentAttribute);
                 NSString* val = [NSString stringWithCString:(char*)str encoding:NSUTF8StringEncoding];
                 xmlFree(str);
-                [attrs setValue:val forKey:name];
+                id valueInMap = [attrs objectForKey:name];
+                if (valueInMap != nil) {
+                    if ([valueInMap isKindOfClass:[NSArray class]]) {
+                        [valueInMap addObject: val];
+                    } else {
+                        NSMutableArray* newArray = [NSMutableArray array];
+                        [newArray addObject: valueInMap];
+                        [newArray addObject:val];
+                        [attrs setValue:newArray forKey:name];
+                    }
+                } else {
+                    [attrs setValue:val forKey:name];
+                }
                 // Only add attributes to nodes if there actually is one.
                 if (![nodes containsObject:attrs]) {
                     [nodes addObject:attrs];
